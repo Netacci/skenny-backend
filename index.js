@@ -3,7 +3,7 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
-import realtorAuthRoutes from './src/routes/realtor/realtor.js';
+import realtorAuthRoutes from './src/routes/realtor/auth.js';
 
 dotenv.config();
 mongoose.connect(process.env.MONGODB_URI).then(() => {

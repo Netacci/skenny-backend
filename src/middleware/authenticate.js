@@ -1,8 +1,7 @@
 import jwt from 'jsonwebtoken';
-import Realtor from '../models/auth/realtor.js';
+import Realtor from '../models/realtor/auth.js';
 
 const authenticate = async (req, res, next) => {
-  console.log(req);
   try {
     const authorization = req.headers.authorization;
     if (authorization === undefined) {
