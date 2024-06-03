@@ -49,7 +49,12 @@ const register = async (req, res) => {
       is_email_verified: false,
     });
     await realtor.save();
-    const link = `http://localhost:5174/email/confirm/${verificationToken}`;
+    // env variable to check of on local host or render
+    const hostlink =
+      process.env.NODE_ENV === 'production'
+        ? 'https://skenny.org'
+        : 'http://localhost:5174';
+    const link = `${hostlink}/email/confirm/${verificationToken}`;
 
     const subject = 'Verify your email to complete registration';
     const dynamicData = {
@@ -133,10 +138,38 @@ const login = async (req, res) => {
   }
 };
 const editProfile = async (req, res) => {
+  const {
+    first_name,
+    last_name,
+    phone_number,
+    address,
+    country,
+    state,
+    account_type,
+    email,
+    password,
+  } = req.body;
+
   try {
-    const realtor = await Realtor.findByIdAndUpdate(req.user._id, req.body, {
-      new: true,
-    });
+    const value = account_type || email || password;
+    if (value) {
+      return res
+        .status(500)
+        .json({ message: `Not allowed to change this value ${value}` });
+    }
+
+    const realtor = await Realtor.findByIdAndUpdate(
+      req.user._id,
+      {
+        first_name,
+        last_name,
+        phone_number,
+        address,
+        country,
+        state,
+      },
+      { new: true }
+    );
 
     res
       .status(200)
@@ -179,10 +212,14 @@ const forgotPassword = async (req, res) => {
       expiresIn: '1h',
     });
     realtor.verificationToken = token;
+    const hostlink =
+      process.env.NODE_ENV === 'production'
+        ? 'https://skenny.org'
+        : 'http://localhost:5174';
     await realtor.save();
     const subject = 'Password reset request';
     const templateId = process.env.SENDGRID_TEMPLATE_ID_RESET;
-    const link = `http://localhost:5174/reset-password/${token}`;
+    const link = `${hostlink}/reset-password/${token}`;
     const dynamicData = {
       verification_link: link,
       subject: subject,
@@ -223,15 +260,6 @@ const deleteRealtorProfile = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-const logout = async (req, res) => {
-  try {
-    req.user.auth.token = null;
-    await req.user.save();
-    res.status(200).json({ message: 'Logout successful' });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
 
 export {
   register,
@@ -240,7 +268,6 @@ export {
   verifyEmail,
   resetPassword,
   forgotPassword,
-  logout,
   editProfile,
   deleteRealtorProfile,
 };

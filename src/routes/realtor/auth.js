@@ -7,7 +7,6 @@ import {
   verifyEmail,
   resetPassword,
   forgotPassword,
-  logout,
   editProfile,
   deleteRealtorProfile,
 } from '../../controller/realtor/auth.js';
@@ -26,8 +25,6 @@ router.put('/verify-email', verifyEmail);
 router.put('/reset-password', resetPassword);
 
 router.put('/forgot-password', forgotPassword);
-
-router.put('/logout', logout);
 
 router.put('/edit-profile', authenticate, editProfile);
 
