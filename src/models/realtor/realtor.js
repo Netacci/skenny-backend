@@ -63,6 +63,10 @@ const realtorPropertiesSchema = new mongoose.Schema(
       type: Array,
       trim: true,
     },
+    feature_image: {
+      type: String,
+      trim: true,
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Realtor',
@@ -76,5 +80,8 @@ const realtorPropertiesSchema = new mongoose.Schema(
   }
 );
 
-const RealtorProperties = mongoose.model('Realtor', realtorPropertiesSchema);
+const RealtorProperties = mongoose.model(
+  'RealtorProperties',
+  realtorPropertiesSchema
+);
 export default RealtorProperties;

@@ -4,6 +4,13 @@ import validator from 'validator';
 import Realtor from '../../models/realtor/auth.js';
 import { sendEmail } from '../../utils/emails.js';
 
+/**
+ * Registers a new realtor in the system.
+ *
+ * @param {Object} req - The request object containing the realtor's information.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves when the realtor is successfully registered.
+ */
 const register = async (req, res) => {
   const { first_name, last_name, email, password, phone_number, account_type } =
     req.body;
@@ -73,6 +80,23 @@ const register = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+/**
+ * Verifies the email of a realtor using a JWT token.
+ *
+ * @param {Object} req - The request object containing the JWT token in the body.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves when the email is successfully verified.
+ *                            Returns a JSON object with the verified realtor data, the token,
+ *                            a success message, and the status code 201 if successful.
+ *                            Returns a JSON object with an error message and the status code 404
+ *                            if the realtor is not found.
+ *                            Returns a JSON object with an error message and the status code 400
+ *                            if the email is already verified.
+ *                            Returns a JSON object with an error message and the status code 401
+ *                            if the token is invalid or expired.
+ *                            Returns a JSON object with an error message and the status code 500
+ *                            if there is an internal server error.
+ */
 const verifyEmail = async (req, res) => {
   const { token } = req.body;
   try {
@@ -101,6 +125,15 @@ const verifyEmail = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+/**
+ * Logs in a realtor by verifying their email and password.
+ *
+ * @param {Object} req - The request object containing the email and password in the body.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves when the realtor is successfully logged in.
+ *                           The response contains the realtor's data, a token, and a success message.
+ * @throws {Error} - If any of the required fields are missing or if the email or password is invalid.
+ */
 const login = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -137,6 +170,13 @@ const login = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+/**
+ * Updates the profile of a realtor in the system.
+ *
+ * @param {Object} req - The request object containing the realtor's updated information.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves when the realtor's profile is successfully updated.
+ */
 const editProfile = async (req, res) => {
   const {
     first_name,
@@ -178,6 +218,17 @@ const editProfile = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+/**
+ * Changes the password of a user.
+ *
+ * @param {Object} req - The request object containing the user's old password and new password in the body.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves when the password is successfully changed.
+ *                            Returns a JSON object with a success message and the status code 200 if successful.
+ *                            Returns a JSON object with an error message and the status code 400 if the old password or new password is missing.
+ *                            Returns a JSON object with an error message and the status code 401 if the old password is invalid.
+ *                            Returns a JSON object with an error message and the status code 500 if there is an internal server error.
+ */
 const changePassword = async (req, res) => {
   const { oldPassword, newPassword } = req.body;
 
@@ -197,6 +248,13 @@ const changePassword = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+/**
+ * Sends a password reset link to the specified email address.
+ *
+ * @param {Object} req - The request object containing the email address.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves when the password reset link is sent successfully.
+ */
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
   try {
@@ -235,6 +293,15 @@ const forgotPassword = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+/**
+ * Resets the password of a user given a valid token.
+ *
+ * @param {Object} req - The request object containing the password and token.
+ * @param {Object} res - The response object.
+ * @return {Promise<void>} - A promise that resolves when the password is successfully changed.
+ *                          - A 404 status code and message if the user is not found.
+ *                          - A 500 status code and message if there is an error.
+ */
 const resetPassword = async (req, res) => {
   const { password, token } = req.body;
   try {
@@ -252,6 +319,15 @@ const resetPassword = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+/**
+ * Deletes the realtor's profile.
+ *
+ * @param {Object} req - The request object containing the user's ID.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves when the profile is successfully deleted.
+ *                            Returns a JSON object with a success message and the status code 200 if successful.
+ *                            Returns a JSON object with an error message and the status code 500 if there is an internal server error.
+ */
 const deleteRealtorProfile = async (req, res) => {
   try {
     await Realtor.findByIdAndDelete(req.user._id);
