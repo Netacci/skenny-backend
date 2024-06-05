@@ -137,12 +137,6 @@ const verifyEmail = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
   try {
-    // if a realtor is banned they can't create property
-    if (req.user.isBanned) {
-      return res
-        .status(403)
-        .json({ message: 'You are banned, contact admin', status: 403 });
-    }
     if (!email || !password) {
       return res.status(400).json({ message: 'All fields are required' });
     }
@@ -154,7 +148,12 @@ const login = async (req, res) => {
     if (!realtor.is_email_verified) {
       return res.status(401).json({ message: 'Email not verified' });
     }
-
+    // if a realtor is banned they can't create property
+    if (realtor.isBanned) {
+      return res
+        .status(403)
+        .json({ message: 'You are banned, contact admin', status: 403 });
+    }
     const isPasswordCorrect = await bcrypt.compare(password, realtor.password);
     if (!isPasswordCorrect) {
       return res.status(401).json({ message: 'Invalid email or password' });
