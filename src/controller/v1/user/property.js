@@ -1,5 +1,5 @@
-import { populateUserDetails } from '../../daos/property-dao.js';
-import RealtorProperties from '../../models/realtor/realtor.js';
+import { populateUserDetails } from '../../../daos/property-dao.js';
+import RealtorProperties from '../../../models/v1/realtor/property.js';
 
 /**
  * Retrieves all properties from the database.
@@ -14,7 +14,7 @@ import RealtorProperties from '../../models/realtor/realtor.js';
  */
 const getAllProperties = async (req, res) => {
   try {
-    const properties = await RealtorProperties.find({});
+    const properties = await RealtorProperties.find({ status: 'approved' });
     res
       .status(200)
       .json({ properties, message: 'Properties fetched successfully' });

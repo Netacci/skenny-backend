@@ -1,9 +1,12 @@
-import { getProperty, populateUserDetails } from '../../daos/property-dao.js';
-import RealtorProperties from '../../models/realtor/realtor.js';
+import {
+  getProperty,
+  populateUserDetails,
+} from '../../../daos/property-dao.js';
+import RealtorProperties from '../../../models/v1/realtor/property.js';
 import {
   deleteFromCloudinary,
   uploadToCloudinary,
-} from '../../utils/upload.js';
+} from '../../../utils/upload.js';
 
 /**
  * Uploads property images to Cloudinary and returns the feature image URL and property image URLs.
@@ -20,11 +23,7 @@ const uploadPropertyImages = async (req, res) => {
       featureImageUrl = await uploadToCloudinary(req.files.feature_image[0]);
     }
     const propertyImageUrls = [];
-    // for(let i = 0; i < req.files.property_images.length; i++){
-    //   const propertyImageUrl = await uploadToCloudinary(req.files.property_images[i]);
-    //   propertyImageUrls.push(propertyImageUrl);
-    // }
-    // return {featureImageUrl, propertyImageUrls}
+
     if (req.files.property_images) {
       for (const file of req.files.property_images) {
         const propertyImageUrl = await uploadToCloudinary(file);
@@ -72,6 +71,7 @@ const addProperty = async (req, res) => {
     property_details,
     feature_image,
     property_images,
+    status = 'pending',
   } = req.body;
   try {
     if (
@@ -86,6 +86,10 @@ const addProperty = async (req, res) => {
     ) {
       return res.status(400).json({ message: 'All fields are required' });
     }
+    // if a realtor is banned they can't create property
+    if (req.user.isBanned) {
+      return res.status(403).json({ message: 'You are banned', status: 403 });
+    }
     const prop = await RealtorProperties.create({
       property_name,
       property_description,
@@ -96,6 +100,7 @@ const addProperty = async (req, res) => {
       property_details,
       feature_image,
       property_images,
+      status,
       user: req.user._id,
     });
     const property = await populateUserDetails(prop);
@@ -158,7 +163,7 @@ const getSingleProperty = async (req, res) => {
 
     const property = await populateUserDetails(result.data);
     res
-      .status(200)
+      .status(result.code)
       .json({ property, message: 'Property fetched successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -200,7 +205,7 @@ const deleteProperty = async (req, res) => {
         await deleteFromCloudinary(imageUrl);
       }
     }
-    res.status(200).json({ message: 'Property deleted successfully' });
+    res.status(result.code).json({ message: 'Property deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -215,6 +220,10 @@ const deleteProperty = async (req, res) => {
 const editProperty = async (req, res) => {
   const { id } = req.params;
   try {
+    // if a realtor is banned they can't create property
+    if (req.user.isBanned) {
+      return res.status(403).json({ message: 'You are banned', status: 403 });
+    }
     const property = await RealtorProperties.findOneAndUpdate(
       { _id: id, user: req.user._id },
       req.body,
@@ -226,9 +235,10 @@ const editProperty = async (req, res) => {
       return res.status(result.code).json({ message: 'Property not found' });
     }
 
-    res
-      .status(200)
-      .json({ property, message: 'Property updated successfully' });
+    res.status(result.code).json({
+      property: result.data,
+      message: 'Property updated successfully',
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -66,6 +66,10 @@ const realtorSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    isBanned: {
+      type: Boolean,
+      default: false,
+    },
     verificationToken: { type: String },
     auth: {
       token: {

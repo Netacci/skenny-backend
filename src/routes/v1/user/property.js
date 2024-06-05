@@ -2,7 +2,7 @@ import { Router } from 'express';
 import {
   getAllProperties,
   getSingleProperty,
-} from '../../controller/user/property.js';
+} from '../../../controller/v1/user/property.js';
 
 const router = Router();
 

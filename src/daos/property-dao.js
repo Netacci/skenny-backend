@@ -1,4 +1,4 @@
-import RealtorProperties from '../models/realtor/realtor.js';
+import RealtorProperties from '../models/v1/realtor/property.js';
 
 /**
  * Populates the 'user' field of a given property with the user's first name, last name, and phone number.
