@@ -84,7 +84,7 @@ const realtorPropertiesSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
-
+realtorPropertiesSchema.index({ property_name: 'text' });
 const RealtorProperties = mongoose.model(
   'RealtorProperties',
   realtorPropertiesSchema

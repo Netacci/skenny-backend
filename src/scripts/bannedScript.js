@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import Realtor from './src/models/v1/realtor/auth.js';
+import Realtor from '../models/v1/realtor/auth.js';
 import dotenv from 'dotenv';
 const updateBannedStatus = async () => {
   dotenv.config();
