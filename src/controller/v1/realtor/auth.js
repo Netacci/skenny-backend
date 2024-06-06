@@ -242,9 +242,14 @@ const changePassword = async (req, res) => {
     if (!oldPassword || !newPassword) {
       return res.status(400).json({ message: 'All fields are required' });
     }
+    if (oldPassword === newPassword) {
+      return res
+        .status(401)
+        .json({ message: 'New password cannot be the same as old password' });
+    }
     const match = await bcrypt.compare(oldPassword, req.user.password);
     if (!match) {
-      return res.status(401).json({ message: 'Invalid credential' });
+      return res.status(401).json({ message: 'Current password is incorrect' });
     }
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     req.user.password = hashedPassword;
@@ -265,9 +270,9 @@ const forgotPassword = async (req, res) => {
   const { email } = req.body;
   try {
     const realtor = await Realtor.findOne({ email });
-
+    // Mask this error message for security reasons. When user isnt find still send Email sent to user message. This can be revisited and changed later
     if (!realtor) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(200).json({ message: 'Email sent to user' });
     }
     if (!realtor.is_email_verified) {
       return res.status(400).json({ message: 'Email not verified' });
@@ -320,6 +325,7 @@ const resetPassword = async (req, res) => {
     realtor.password = hashedPassword;
     realtor.verificationToken = undefined;
     await realtor.save();
+    // TODO Send out email to notifiy user that passssword has been reset
     res.status(200).json({ message: 'Password changed successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });
