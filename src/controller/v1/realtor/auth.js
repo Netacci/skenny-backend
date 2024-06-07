@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import validator from 'validator';
 import Realtor from '../../../models/v1/realtor/auth.js';
 import { sendEmail } from '../../../utils/emails.js';
+import logger from '../../../utils/logger.js';
 
 /**
  * Registers a new realtor in the system.
@@ -138,24 +139,33 @@ const login = async (req, res) => {
   const { email, password } = req.body;
   try {
     if (!email || !password) {
+      logger.error(
+        'User cannot login because email and password is not provided'
+      );
       return res.status(400).json({ message: 'All fields are required' });
     }
 
     const realtor = await Realtor.findOne({ email });
     if (!realtor) {
+      logger.warn(`Realtor with ${email} not found`);
       return res.status(401).json({ message: 'Invalid email or password' });
     }
     if (!realtor.is_email_verified) {
+      logger.warn(`Realtor with ${email} has not verified email`);
       return res.status(401).json({ message: 'Email not verified' });
     }
     // if a realtor is banned they can't create property
     if (realtor.isBanned) {
+      logger.warn(`This Realtor ${email} is banned`);
       return res
         .status(403)
         .json({ message: 'You are banned, contact admin', status: 403 });
     }
     const isPasswordCorrect = await bcrypt.compare(password, realtor.password);
     if (!isPasswordCorrect) {
+      logger.warn(
+        `Realtor with ${email} provided the wrong password ${password}`
+      );
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
@@ -169,6 +179,8 @@ const login = async (req, res) => {
     );
     realtor.auth.token = token;
     await realtor.save();
+    logger.info(`Token generated for Realtor with ${email}`);
+    logger.info(`Realtor with ${email} logged in successfully`);
     res
       .status(200)
       .json({ data: realtor, token, message: 'Login successful', status: 200 });
