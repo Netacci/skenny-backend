@@ -17,51 +17,26 @@ import {
  * @return {Promise<Object>} An object containing the feature image URL and property image URLs.
  * @throws {Error} If there is an error uploading the images to Cloudinary.
  */
-// const uploadPropertyImages = async (req, res) => {
-//   try {
-//     let featureImageUrl;
-//     if (req.files.feature_image) {
-//       featureImageUrl = await uploadToCloudinary(req.files.feature_image[0]);
-//     }
-//     const propertyImageUrls = [];
-
-//     if (req.files.property_images) {
-//       for (const file of req.files.property_images) {
-//         const propertyImageUrl = await uploadToCloudinary(file);
-//         propertyImageUrls.push(propertyImageUrl);
-//       }
-//     }
-//     res.status(200).json({
-//       feature_image: featureImageUrl,
-//       property_images: propertyImageUrls,
-//     });
-//   } catch (err) {
-//     logger.error(`Error uploading property images: ${err}`);
-//     res.status(500).json({ message: err.message });
-//   }
-// };
 const uploadPropertyImages = async (req, res) => {
   try {
-    const { feature_image, property_images } = req.body;
     let featureImageUrl;
-    const propertyImageUrls = [];
-
-    if (feature_image) {
-      featureImageUrl = await uploadToCloudinary(feature_image);
+    if (req.file) {
+      featureImageUrl = await uploadToCloudinary(req.file.buffer);
     }
+    // const propertyImageUrls = [];
 
-    if (property_images && Array.isArray(property_images)) {
-      for (const base64Image of property_images) {
-        const propertyImageUrl = await uploadToCloudinary(base64Image);
-        propertyImageUrls.push(propertyImageUrl);
-      }
-    }
-
+    // if (req.files.property_images) {
+    //   for (const file of req.files.property_images) {
+    //     const propertyImageUrl = await uploadToCloudinary(file);
+    //     propertyImageUrls.push(propertyImageUrl);
+    //   }
+    // }
     res.status(200).json({
       feature_image: featureImageUrl,
-      property_images: propertyImageUrls,
+      // property_images: propertyImageUrls,
     });
   } catch (err) {
+    logger.error(`Error uploading property images: ${err}`);
     res.status(500).json({ message: err.message });
   }
 };

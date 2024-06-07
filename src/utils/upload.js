@@ -20,21 +20,22 @@ cloudinary.config({
  * @return {void}
  */
 // Configure Multer
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'src/uploads/'); // Temporary folder to store files
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // Append extension
-  },
-});
-
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, 'src/uploads/'); // Temporary folder to store files
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, Date.now() + path.extname(file.originalname)); // Append extension
+//   },
+// });
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-const uploadFiles = upload.fields([
-  { name: 'feature_image', maxCount: 1 },
-  { name: 'property_images', maxCount: 10 },
-]);
+// const uploadFiles = upload.fields([
+//   { name: 'feature_image', maxCount: 1 },
+//   { name: 'property_images', maxCount: 10 },
+// ]);
+const uploadFiles = upload.single('feature_image');
 
 /**
  * Uploads a file to Cloudinary and deletes it from the temporary folder after uploading.
@@ -44,18 +45,30 @@ const uploadFiles = upload.fields([
  * @return {Promise<string>} The secure URL of the uploaded file.
  * @throws {Error} If the upload to Cloudinary fails.
  */
-const uploadToCloudinary = async (file) => {
-  try {
-    const result = await cloudinary.uploader.upload(file.path);
-    // Delete the file from the temporary folder after uploading
-    fs.unlinkSync(file.path);
-    return result.secure_url;
-  } catch (error) {
-    // If there is an error, delete the file as well
-    fs.unlinkSync(file.path);
-    throw new Error('Failed to upload to Cloudinary');
-  }
+// const uploadToCloudinary = async (file) => {
+//   try {
+//     const result = await cloudinary.uploader.upload(file.path);
+//     // Delete the file from the temporary folder after uploading
+//     fs.unlinkSync(file.path);
+//     return result.secure_url;
+//   } catch (error) {
+//     // If there is an error, delete the file as well
+//     fs.unlinkSync(file.path);
+//     throw new Error('Failed to upload to Cloudinary');
+//   }
+// };
+const uploadToCloudinary = (buffer) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream((error, result) => {
+      if (error) {
+        return reject(error);
+      }
+      resolve(result.secure_url);
+    });
+    stream.end(buffer);
+  });
 };
+
 /**
  * Deletes an image from Cloudinary based on the provided image URL.
  *
