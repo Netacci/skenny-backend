@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import logger from './logger.js';
 
 dotenv.config();
 cloudinary.config({
@@ -69,7 +70,8 @@ const deleteFromCloudinary = async (imageUrl) => {
     // Delete the image from Cloudinary
     await cloudinary.uploader.destroy(publicId);
   } catch (error) {
-    console.error('Error deleting image from Cloudinary:', error);
+    // console.error('Error deleting image from Cloudinary:', error);
+    logger.error('Error deleting image from Cloudinary:', error);
   }
 };
 

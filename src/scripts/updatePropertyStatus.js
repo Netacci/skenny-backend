@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Property from '../models/v1/realtor/property.js';
 import dotenv from 'dotenv';
+import logger from '../utils/logger.js';
 const updatePropertiesStatus = async () => {
   dotenv.config();
   try {
@@ -16,9 +17,11 @@ const updatePropertiesStatus = async () => {
       { $set: { status: 'pending' } }
     );
 
-    console.log(`Successfully updated ${result.nModified} properties.`);
+    // console.log(`Successfully updated ${result.nModified} properties.`);
+    logger.info(`Successfully updated ${result.nModified} properties.`);
   } catch (err) {
-    console.error('Error updating properties:', err);
+    // console.error('Error updating properties:', err);
+    logger.error('Error updating properties:', err);
   } finally {
     // Close the database connection
     await mongoose.connection.close();

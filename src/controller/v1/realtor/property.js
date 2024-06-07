@@ -3,6 +3,7 @@ import {
   populateUserDetails,
 } from '../../../daos/property-dao.js';
 import RealtorProperties from '../../../models/v1/realtor/property.js';
+import logger from '../../../utils/logger.js';
 import {
   deleteFromCloudinary,
   uploadToCloudinary,
@@ -35,6 +36,7 @@ const uploadPropertyImages = async (req, res) => {
       property_images: propertyImageUrls,
     });
   } catch (err) {
+    logger.error(`Error uploading property images: ${err}`);
     res.status(500).json({ message: err.message });
   }
 };

@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Realtor from '../models/v1/realtor/auth.js';
 import dotenv from 'dotenv';
+import logger from '../utils/logger.js';
 const updateBannedStatus = async () => {
   dotenv.config();
   try {
@@ -13,9 +14,11 @@ const updateBannedStatus = async () => {
       { $set: { isBanned: false } }
     );
 
-    console.log(`Successfully updated ${result.nModified} properties.`);
+    // console.log(`Successfully updated ${result.nModified} properties.`);
+    logger.info(`Successfully updated ${result.nModified} properties.`);
   } catch (err) {
-    console.error('Error updating properties:', err);
+    // console.error('Error updating properties:', err);
+    logger.error('Error updating properties:', err);
   } finally {
     // Close the database connection
     await mongoose.connection.close();
