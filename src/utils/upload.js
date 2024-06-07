@@ -35,33 +35,9 @@ const upload = multer({ storage: storage });
 //   { name: 'feature_image', maxCount: 1 },
 //   { name: 'property_images', maxCount: 10 },
 // ]);
-// const uploadFiles = upload.single('feature_image');
-// const uploadFiles = upload.array(['feature_image', 'property_images']);
-const uploadFiles = (req, res, next) => {
-  // Check if the request body contains property_images array
-  if (
-    Array.isArray(req.body.property_images) &&
-    req.body.property_images.length > 1
-  ) {
-    // If property_images array contains more than one file, use upload.array middleware
-    upload.array('property_images')(req, res, (err) => {
-      if (err) {
-        return res
-          .status(400)
-          .json({ message: 'Error uploading multiple files' });
-      }
-      next();
-    });
-  } else {
-    // If property_images array contains only one file or if it's not an array, use upload.single middleware
-    upload.single('feature_image')(req, res, (err) => {
-      if (err) {
-        return res.status(400).json({ message: 'Error uploading single file' });
-      }
-      next();
-    });
-  }
-};
+const uploadSingleFile = upload.single('feature_image');
+const uploadMultipleFiles = upload.array('property_images[]', 10);
+
 /**
  * Uploads a file to Cloudinary and deletes it from the temporary folder after uploading.
  *
@@ -113,4 +89,9 @@ const deleteFromCloudinary = async (imageUrl) => {
   }
 };
 
-export { uploadFiles, uploadToCloudinary, deleteFromCloudinary };
+export {
+  uploadSingleFile,
+  uploadMultipleFiles,
+  uploadToCloudinary,
+  deleteFromCloudinary,
+};

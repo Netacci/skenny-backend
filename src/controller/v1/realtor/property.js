@@ -19,9 +19,9 @@ import {
  */
 const uploadPropertyImages = async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ message: 'No files uploaded' });
-    }
+    // if (!req.file) {
+    //   return res.status(400).json({ message: 'No files uploaded' });
+    // }
     let featureImageUrl;
     if (req.file) {
       featureImageUrl = await uploadToCloudinary(req.file.buffer);

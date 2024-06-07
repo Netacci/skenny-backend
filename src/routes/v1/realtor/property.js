@@ -8,7 +8,10 @@ import {
   uploadPropertyImages,
 } from '../../../controller/v1/realtor/property.js';
 import authenticate from '../../../middleware/authenticate.js';
-import { uploadFiles } from '../../../utils/upload.js';
+import {
+  uploadSingleFile,
+  uploadMultipleFiles,
+} from '../../../utils/upload.js';
 
 const router = Router();
 
@@ -20,7 +23,13 @@ router.get('/:id', authenticate('realtor'), getSingleProperty);
 router.post(
   '/upload',
   authenticate('realtor'),
-  uploadFiles,
+  uploadSingleFile,
+  uploadPropertyImages
+);
+router.post(
+  '/uploads',
+  authenticate('realtor'),
+  uploadMultipleFiles,
   uploadPropertyImages
 );
 
