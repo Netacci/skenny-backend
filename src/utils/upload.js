@@ -36,7 +36,7 @@ const upload = multer({ storage: storage });
 //   { name: 'property_images', maxCount: 10 },
 // ]);
 // const uploadFiles = upload.single('feature_image');
-upload.array(['feature_image', 'property_images']);
+const uploadFiles = upload.array(['feature_image', 'property_images']);
 /**
  * Uploads a file to Cloudinary and deletes it from the temporary folder after uploading.
  *
