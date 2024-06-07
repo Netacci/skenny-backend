@@ -23,17 +23,17 @@ const uploadPropertyImages = async (req, res) => {
     if (req.file) {
       featureImageUrl = await uploadToCloudinary(req.file.buffer);
     }
-    // const propertyImageUrls = [];
+    const propertyImageUrls = [];
 
-    // if (req.files.property_images) {
-    //   for (const file of req.files.property_images) {
-    //     const propertyImageUrl = await uploadToCloudinary(file);
-    //     propertyImageUrls.push(propertyImageUrl);
-    //   }
-    // }
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const propertyImageUrl = await uploadToCloudinary(file.buffer);
+        propertyImageUrls.push(propertyImageUrl);
+      }
+    }
     res.status(200).json({
       feature_image: featureImageUrl,
-      // property_images: propertyImageUrls,
+      property_images: propertyImageUrls,
     });
   } catch (err) {
     logger.error(`Error uploading property images: ${err}`);
