@@ -129,7 +129,8 @@ const addProperty = async (req, res) => {
  */
 const getAllProperties = async (req, res) => {
   try {
-    let { page = 1, limit = 10, q, state, country, propertyType } = req.query;
+    let { page = 1, limit = 10, q, state, country, property_type } = req.query;
+
     let query = { user: req.user._id };
 
     if (q) {
@@ -142,10 +143,16 @@ const getAllProperties = async (req, res) => {
     if (country) {
       query.country = country;
     }
-    if (propertyType) {
-      query['property_details.property_type'] = propertyType;
+    if (property_type) {
+      query['property_details.property_type'] = property_type;
     }
-
+    // if (property_type) {
+    //   query.property_details = { $elemMatch: { property_type: property_type } };
+    // }
+    // if (propertyType) {
+    //   query['property_details.property_type'] = { $eq: property_type };
+    // }
+    console.log(req.query.property_type);
     page = parseInt(page);
     limit = parseInt(limit);
     const skip = (page - 1) * limit;

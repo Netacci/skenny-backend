@@ -140,7 +140,7 @@ const changePassword = async (req, res) => {
  */
 const getAllAdmins = async (req, res) => {
   try {
-    const admins = await Admin.find({});
+    const admins = await Admin.find({}).select('-password -__v -token');
     res
       .status(200)
       .json({ admins, message: 'Admins fetched successfully', status: 200 });
@@ -196,7 +196,7 @@ const editAdmin = async (req, res) => {
       id,
       { first_name, last_name, role },
       { new: true }
-    );
+    ).select('-password -__v');
 
     res
       .status(result.code)

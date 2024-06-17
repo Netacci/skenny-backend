@@ -48,10 +48,27 @@ const getAllProperties = async (req, res) => {
 };
 const getAllRealtors = async (req, res) => {
   try {
-    const realtors = await Realtor.find({});
-    res
-      .status(200)
-      .json({ realtors, message: 'Realtors fetched successfully' });
+    let { page = 1, limit = 10 } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+    const skip = (page - 1) * limit;
+
+    const realtors = await Realtor.find({})
+      // select removes some fields from being displayed in the response
+      .select('-password -__v -auth')
+      .skip(skip)
+      .limit(limit);
+
+    const totalRealtors = await Realtor.countDocuments();
+    res.status(200).json({
+      realtors,
+      message: 'Realtors fetched successfully',
+      metadata: {
+        totalRealtors,
+        totalPages: Math.ceil(totalRealtors / limit),
+        currentPage: page,
+      },
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -74,7 +91,9 @@ const getSingleProperty = async (req, res) => {
 const getSingleRealtor = async (req, res) => {
   const { id } = req.params;
   try {
-    const realtor = await Realtor.findOne({ _id: id });
+    const realtor = await Realtor.findOne({ _id: id }).select(
+      '-password -__v -auth'
+    );
     if (!realtor) {
       return res.status(404).json({ message: 'Realtor not found' });
     }
