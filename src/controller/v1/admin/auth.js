@@ -59,6 +59,7 @@ const addAdmin = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
+    console.error('Error:', err.response ? err.response.body : err.message);
   }
 };
 

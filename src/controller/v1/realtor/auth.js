@@ -4,6 +4,7 @@ import validator from 'validator';
 import Realtor from '../../../models/v1/realtor/auth.js';
 import { sendEmail } from '../../../utils/emails.js';
 import logger from '../../../utils/logger.js';
+import { body, validationResult, query } from 'express-validator';
 
 /**
  * Registers a new realtor in the system.
@@ -13,6 +14,12 @@ import logger from '../../../utils/logger.js';
  * @returns {Promise<void>} - A promise that resolves when the realtor is successfully registered.
  */
 const register = async (req, res) => {
+  await body('email').isEmail().normalizeEmail().run(req);
+  await body('password').isLength({ min: 6 }).run(req);
+  await body('first_name').escape().trim().run(req);
+  await body('last_name').escape().trim().run(req);
+  await body('phone_number').escape().trim().run(req);
+  await body('account_type').escape().trim().run(req);
   const { first_name, last_name, email, password, phone_number, account_type } =
     req.body;
   try {
@@ -36,7 +43,11 @@ const register = async (req, res) => {
         message: `Phone number ${phone_number} already exists`,
       });
     }
-
+    if (!validator.isStrongPassword(password)) {
+      return res.status(400).json({
+        message: `Weak password: ${password}. Your password must include lowercase, uppercase, digits, symbols and must be at least 8 characters`,
+      });
+    }
     const verificationToken = jwt.sign(
       { email: email },
       process.env.JWT_SECRET,

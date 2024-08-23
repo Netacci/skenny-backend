@@ -11,12 +11,13 @@ import {
   deleteRealtorProfile,
 } from '../../../controller/v1/realtor/auth.js';
 import authenticate from '../../../middleware/authenticate.js';
+import { loginLimiter } from '../../../middleware/rateLimiting.js';
 
 const router = Router();
 
 router.post('/register', register);
 
-router.post('/login', login);
+router.post('/login', loginLimiter, login);
 
 router.put('/change-password', authenticate('realtor'), changePassword);
 

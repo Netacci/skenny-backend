@@ -10,11 +10,12 @@ import {
   singleAdmin,
 } from '../../../controller/v1/admin/auth.js';
 import authenticate from '../../../middleware/authenticate.js';
+import { loginLimiter } from '../../../middleware/rateLimiting.js';
 
 const router = Router();
 
 router.post('/', authenticate('admin'), addAdmin);
-router.post('/login', login);
+router.post('/login', loginLimiter, login);
 router.put('/change-password', authenticate('admin'), changePassword);
 router.get('/all-admins', authenticate('admin'), getAllAdmins);
 router.put('/:id', authenticate('admin'), editAdmin);

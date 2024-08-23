@@ -30,7 +30,7 @@ const getAllProperties = async (req, res) => {
       .limit(limit)
       .populate({
         path: 'user',
-        select: 'first_name last_name phone_number',
+        select: 'first_name last_name phone_number email',
       });
     const totalProperties = await RealtorProperties.countDocuments(query);
     res.status(200).json({

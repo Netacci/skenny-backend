@@ -8,6 +8,7 @@ import {
   deleteFromCloudinary,
   uploadToCloudinary,
 } from '../../../utils/upload.js';
+import { body, validationResult } from 'express-validator';
 
 /**
  * Uploads property images to Cloudinary and returns the feature image URL and property image URLs.
@@ -66,6 +67,19 @@ const uploadPropertyImages = async (req, res) => {
  * app.post('/properties', addProperty);
  */
 const addProperty = async (req, res) => {
+  // Validation and Sanitization
+  await body('property_name').notEmpty().trim().escape().run(req);
+  await body('property_description').notEmpty().trim().escape().run(req);
+  await body('address').optional().trim().escape().run(req);
+  await body('country').notEmpty().trim().escape().run(req);
+  await body('state').notEmpty().trim().escape().run(req);
+  await body('city').optional().trim().escape().run(req);
+  await body('feature_image').notEmpty().trim().escape().isURL().run(req);
+  await body('property_images').optional().isArray().run(req);
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
   const {
     property_name,
     property_description,
@@ -82,11 +96,8 @@ const addProperty = async (req, res) => {
     if (
       !property_name ||
       !property_description ||
-      !address ||
       !country ||
       !state ||
-      !city ||
-      !property_details ||
       !feature_image
     ) {
       return res.status(400).json({ message: 'All fields are required' });

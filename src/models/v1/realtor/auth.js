@@ -1,3 +1,4 @@
+import { checkSchema } from 'express-validator';
 import mongoose from 'mongoose';
 import validator from 'validator';
 
@@ -36,6 +37,7 @@ const realtorSchema = new mongoose.Schema(
         }
       },
     },
+
     password: {
       type: String,
       required: true,

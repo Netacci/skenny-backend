@@ -31,13 +31,14 @@ app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 app.use(morganMiddleware);
 const corsOptions = {
-  origin:
-    'http://localhost:5000' ||
-    'http://localhost:5174' ||
+  origin: [
+    'http://localhost:5000',
+    'http://localhost:5174',
     'https://www.skenny.org',
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowHeaders: [
+  allowedHeaders: [
     'Content-Type',
     'Authorization',
     'Access-Control-Allow-Credentials',
