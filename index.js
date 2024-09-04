@@ -35,6 +35,8 @@ const corsOptions = {
     'http://localhost:5000',
     'http://localhost:5174',
     'https://www.skenny.org',
+    'http://localhost:5175',
+    'https://skenny-admin.vercel.app/',
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
