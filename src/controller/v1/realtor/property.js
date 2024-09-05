@@ -67,6 +67,9 @@ const uploadPropertyImages = async (req, res) => {
  * app.post('/properties', addProperty);
  */
 const addProperty = async (req, res) => {
+  if (req.body.feature_image) {
+    req.body.feature_image = decodeURIComponent(req.body.feature_image);
+  }
   // Validation and Sanitization
   await body('property_name').notEmpty().trim().escape().run(req);
   await body('property_description').notEmpty().trim().escape().run(req);
@@ -74,7 +77,16 @@ const addProperty = async (req, res) => {
   await body('country').notEmpty().trim().escape().run(req);
   await body('state').notEmpty().trim().escape().run(req);
   await body('city').optional().trim().escape().run(req);
-  await body('feature_image').notEmpty().trim().escape().isURL().run(req);
+  await body('feature_image')
+    .notEmpty()
+    .custom((value) => {
+      const decodedValue = decodeURIComponent(value);
+      if (decodedValue.startsWith('https://res.cloudinary.com/')) {
+        return true;
+      }
+      throw new Error('Invalid feature image URL');
+    })
+    .run(req);
   await body('property_images').optional().isArray().run(req);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
