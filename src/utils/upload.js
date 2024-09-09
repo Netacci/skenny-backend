@@ -1,10 +1,9 @@
 import { v2 as cloudinary } from 'cloudinary';
 import dotenv from 'dotenv';
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
 import logger from './logger.js';
 import { v4 as uuidv4 } from 'uuid';
+import cron from 'node-cron';
 
 dotenv.config();
 cloudinary.config({
@@ -61,24 +60,42 @@ const deleteFromCloudinary = async (publicId) => {
     throw error;
   }
 };
-// Cleanup job (run periodically, e.g., daily)
-async function cleanupTemporaryImages() {
-  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  const { resources } = await cloudinary.search
-    .expression(
-      `folder:temp_properties AND uploaded_at<${oneDayAgo.toISOString()}`
-    )
-    .execute();
+// Function to delete temp_properties images from Cloudinary
+const deleteTempImages = async () => {
+  try {
+    // Search for images starting with 'temp_properties/'
+    const result = await cloudinary.api.resources({
+      type: 'upload',
+      prefix: 'temp_properties/', // This filters for images starting with 'temp_properties/'
+      max_results: 500, // You can adjust this if you expect a large number of images
+    });
 
-  for (const resource of resources) {
-    await deleteImage(resource.public_id);
+    // Extract public_ids of the images found
+    const imagesToDelete = result.resources.map((image) => image.public_id);
+
+    if (imagesToDelete.length > 0) {
+      // Delete images from Cloudinary
+      const deleteResponse = await cloudinary.api.delete_resources(
+        imagesToDelete
+      );
+      logger.info('Deleted temp images:', deleteResponse);
+    } else {
+      logger.info('No temp images found to delete.');
+    }
+  } catch (error) {
+    logger.error('Error deleting temp images:', error);
   }
-}
+};
+
+// Schedule the job to run every 24 hours
+cron.schedule('*/2 * * * *', () => {
+  logger.info('Running daily temp image cleanup job...');
+  deleteTempImages();
+});
 export {
   uploadSingleFile,
   uploadMultipleFiles,
   uploadToCloudinary,
   deleteFromCloudinary,
   moveToPermamentFolder,
-  cleanupTemporaryImages,
 };
