@@ -17,11 +17,9 @@ dotenv.config();
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
-    // console.log('Connected to MongoDB');
     logger.info('Connected to MongoDB');
   })
   .catch((err) => {
-    // console.log(`Error connecting to MongoDB: ${err}`);
     logger.error(`Error connecting to MongoDB: ${err}`);
   });
 const app = express();
@@ -55,6 +53,5 @@ app.use('/api/v1/admin/auth', adminAuthRoutes);
 app.use('/api/v1/admin', adminRoutes);
 
 app.listen(process.env.PORT, () => {
-  // console.log(`Server is running on port ${process.env.PORT}`);
   logger.info(`Server is running on port ${process.env.PORT}`);
 });

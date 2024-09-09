@@ -30,7 +30,7 @@ const getAllProperties = async (req, res) => {
     if (propertyType) {
       query['property_details.property_type'] = propertyType;
     }
-    console.log(query);
+
     page = parseInt(page);
     limit = parseInt(limit);
     const skip = (page - 1) * limit;

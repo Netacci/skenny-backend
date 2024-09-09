@@ -17,7 +17,6 @@ const updatePropertiesStatus = async () => {
       { $set: { status: 'pending' } }
     );
 
-    // console.log(`Successfully updated ${result.nModified} properties.`);
     logger.info(`Successfully updated ${result.nModified} properties.`);
   } catch (err) {
     // console.error('Error updating properties:', err);
