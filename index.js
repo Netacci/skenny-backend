@@ -33,7 +33,7 @@ app.use(morganMiddleware);
 const corsOptions = {
   origin: [
     'http://localhost:5000',
-    'http://localhost:5174',
+    'http://localhost:5173',
     'https://www.skenny.org',
     'http://localhost:5175',
     'https://skenny-admin.vercel.app',

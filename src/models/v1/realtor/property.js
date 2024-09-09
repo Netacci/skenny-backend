@@ -59,13 +59,31 @@ const realtorPropertiesSchema = new mongoose.Schema(
         trim: true,
       },
     },
-    property_images: {
-      type: Array,
-      trim: true,
-    },
+
+    property_images: [
+      {
+        url: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        public_id: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+
     feature_image: {
-      type: String,
-      trim: true,
+      url: {
+        type: String,
+        trim: true,
+        required: true,
+      },
+      public_id: {
+        type: String,
+        required: true,
+      },
     },
     status: {
       type: String,

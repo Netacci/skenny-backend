@@ -4,6 +4,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import logger from './logger.js';
+import { v4 as uuidv4 } from 'uuid';
 
 dotenv.config();
 cloudinary.config({
@@ -11,87 +12,73 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-/**
- * Sets the destination folder for storing uploaded files.
- *
- * @param {Object} req - The request object.
- * @param {Object} file - The uploaded file object.
- * @param {Function} cb - The callback function.
- * @return {void}
- */
-// Configure Multer
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, 'src/uploads/'); // Temporary folder to store files
-//   },
-//   filename: (req, file, cb) => {
-//     cb(null, Date.now() + path.extname(file.originalname)); // Append extension
-//   },
-// });
+
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// const uploadFiles = upload.fields([
-//   { name: 'feature_image', maxCount: 1 },
-//   { name: 'property_images', maxCount: 10 },
-// ]);
 const uploadSingleFile = upload.single('feature_image');
 const uploadMultipleFiles = upload.array('property_images[]', 10);
 
-/**
- * Uploads a file to Cloudinary and deletes it from the temporary folder after uploading.
- *
- * @param {Object} file - The file to upload.
- * @param {string} file.path - The path to the file.
- * @return {Promise<string>} The secure URL of the uploaded file.
- * @throws {Error} If the upload to Cloudinary fails.
- */
-// const uploadToCloudinary = async (file) => {
-//   try {
-//     const result = await cloudinary.uploader.upload(file.path);
-//     // Delete the file from the temporary folder after uploading
-//     fs.unlinkSync(file.path);
-//     return result.secure_url;
-//   } catch (error) {
-//     // If there is an error, delete the file as well
-//     fs.unlinkSync(file.path);
-//     throw new Error('Failed to upload to Cloudinary');
-//   }
-// };
-const uploadToCloudinary = (buffer) => {
+const uploadToCloudinary = (buffer, folder = 'temp_properties') => {
   return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream((error, result) => {
-      if (error) {
-        return reject(error);
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder, public_id: uuidv4() },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve({ url: result.secure_url, public_id: result.public_id });
       }
-      resolve(result.secure_url);
-    });
-    stream.end(buffer);
+    );
+    uploadStream.end(buffer);
   });
 };
 
-/**
- * Deletes an image from Cloudinary based on the provided image URL.
- *
- * @param {string} imageUrl - The URL of the image to be deleted.
- * @return {Promise<void>} - A promise that resolves when the image is successfully deleted.
- * @throws {Error} - If there is an error deleting the image from Cloudinary.
- */
-const deleteFromCloudinary = async (imageUrl) => {
+const moveToPermamentFolder = async (publicId) => {
   try {
-    // Extract the public ID from the image URL
-    const publicId = imageUrl.split('/').pop().split('.')[0];
-    // Delete the image from Cloudinary
-    await cloudinary.uploader.destroy(publicId);
+    if (!publicId) throw new Error('Missing required public ID');
+
+    // Extract the filename from the public ID
+    const filename = publicId.split('/').pop();
+
+    // Construct the new public ID in the permanent folder
+    const newPublicId = `permanent_properties/${filename}`;
+
+    const result = await cloudinary.uploader.rename(publicId, newPublicId, {
+      invalidate: true,
+    });
+
+    return { url: result.secure_url, public_id: result.public_id };
   } catch (error) {
-    // console.error('Error deleting image from Cloudinary:', error);
-    logger.error('Error deleting image from Cloudinary:', error);
+    logger.error('Error moving image to permanent folder:', error.message);
+    throw error;
   }
 };
 
+const deleteFromCloudinary = async (publicId) => {
+  try {
+    await cloudinary.uploader.destroy(publicId);
+  } catch (error) {
+    logger.error('Error deleting image from Cloudinary:', error);
+    throw error;
+  }
+};
+// Cleanup job (run periodically, e.g., daily)
+async function cleanupTemporaryImages() {
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const { resources } = await cloudinary.search
+    .expression(
+      `folder:temp_properties AND uploaded_at<${oneDayAgo.toISOString()}`
+    )
+    .execute();
+
+  for (const resource of resources) {
+    await deleteImage(resource.public_id);
+  }
+}
 export {
   uploadSingleFile,
   uploadMultipleFiles,
   uploadToCloudinary,
   deleteFromCloudinary,
+  moveToPermamentFolder,
+  cleanupTemporaryImages,
 };

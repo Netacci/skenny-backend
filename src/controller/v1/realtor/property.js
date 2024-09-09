@@ -7,6 +7,7 @@ import logger from '../../../utils/logger.js';
 import {
   deleteFromCloudinary,
   uploadToCloudinary,
+  moveToPermamentFolder,
 } from '../../../utils/upload.js';
 import { body, validationResult } from 'express-validator';
 
@@ -20,9 +21,6 @@ import { body, validationResult } from 'express-validator';
  */
 const uploadPropertyImages = async (req, res) => {
   try {
-    // if (!req.file) {
-    //   return res.status(400).json({ message: 'No files uploaded' });
-    // }
     let featureImageUrl;
     if (req.file) {
       featureImageUrl = await uploadToCloudinary(req.file.buffer);
@@ -35,6 +33,7 @@ const uploadPropertyImages = async (req, res) => {
         propertyImageUrls.push(propertyImageUrl);
       }
     }
+
     res.status(200).json({
       feature_image: featureImageUrl,
       property_images: propertyImageUrls,
@@ -66,10 +65,12 @@ const uploadPropertyImages = async (req, res) => {
  * @example
  * app.post('/properties', addProperty);
  */
+
 const addProperty = async (req, res) => {
   if (req.body.feature_image) {
     req.body.feature_image = decodeURIComponent(req.body.feature_image);
   }
+
   // Validation and Sanitization
   await body('property_name').notEmpty().trim().escape().run(req);
   await body('property_description').notEmpty().trim().escape().run(req);
@@ -77,21 +78,37 @@ const addProperty = async (req, res) => {
   await body('country').notEmpty().trim().escape().run(req);
   await body('state').notEmpty().trim().escape().run(req);
   await body('city').optional().trim().escape().run(req);
-  await body('feature_image')
-    .notEmpty()
-    .custom((value) => {
-      const decodedValue = decodeURIComponent(value);
-      if (decodedValue.startsWith('https://res.cloudinary.com/')) {
-        return true;
-      }
-      throw new Error('Invalid feature image URL');
-    })
-    .run(req);
+  // await body('feature_image')
+  //   .custom((value) => {
+  //     // Check if the value is an object and not null
+  //     if (typeof value === 'object' && value !== null) {
+  //       const { url, public_id } = value;
+
+  //       // Ensure both url and public_id exist
+  //       if (!url || !public_id) {
+  //         throw new Error('Feature image must contain both URL and public ID');
+  //       }
+
+  //       // Validate URL
+  //       const decodedUrl = decodeURIComponent(url || '');
+  //       if (!decodedUrl.startsWith('https://res.cloudinary.com/')) {
+  //         throw new Error('Invalid feature image URL');
+  //       }
+
+  //       return true;
+  //     }
+
+  //     throw new Error('Feature image must be an object');
+  //   })
+  //   .run(req);
+
   await body('property_images').optional().isArray().run(req);
+
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
+
   const {
     property_name,
     property_description,
@@ -104,6 +121,7 @@ const addProperty = async (req, res) => {
     property_images,
     status = 'pending',
   } = req.body;
+
   try {
     if (
       !property_name ||
@@ -114,10 +132,29 @@ const addProperty = async (req, res) => {
     ) {
       return res.status(400).json({ message: 'All fields are required' });
     }
-    // if a realtor is banned they can't create property
+
     if (req.user.isBanned) {
       return res.status(403).json({ message: 'You are banned', status: 403 });
     }
+    const featImage = JSON.parse(feature_image);
+    // Move images to permanent folder
+    const permanentFeatureImage = featImage?.public_id
+      ? await moveToPermamentFolder(featImage?.public_id)
+      : null;
+    // const permanentPropertyImages = await Promise.all(
+    //   property_images.map((image) => moveToPermamentFolder(image?.public_id))
+    // );
+
+    const permanentPropertyImages = await Promise.all(
+      property_images.map((image) => {
+        if (image?.public_id) {
+          return moveToPermamentFolder(image.public_id);
+        } else {
+          logger.warn('Image is missing public_id:', image);
+          return null; // Or handle as you wish if public_id is missing
+        }
+      })
+    );
     const prop = await RealtorProperties.create({
       property_name,
       property_description,
@@ -126,14 +163,21 @@ const addProperty = async (req, res) => {
       state,
       city,
       property_details,
-      feature_image,
-      property_images,
+      feature_image: permanentFeatureImage,
+      property_images: permanentPropertyImages,
       status,
       user: req.user._id,
     });
+
     const property = await populateUserDetails(prop);
+    // Delete temporary images after successful property creation
+    await deleteFromCloudinary(featImage.public_id);
+    await Promise.all(
+      property_images.map((image) => deleteFromCloudinary(image.public_id))
+    );
     res.status(201).json({ message: 'Property added successfully', property });
   } catch (err) {
+    logger.error('Error adding property:', err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -175,7 +219,7 @@ const getAllProperties = async (req, res) => {
     // if (propertyType) {
     //   query['property_details.property_type'] = { $eq: property_type };
     // }
-    console.log(req.query.property_type);
+
     page = parseInt(page);
     limit = parseInt(limit);
     const skip = (page - 1) * limit;
@@ -245,32 +289,60 @@ const getSingleProperty = async (req, res) => {
  * @throws {Error} If the property is not found or if there is an error deleting the property from the database.
  * @returns {Promise<void>} - A promise that resolves when the property is deleted successfully.
  */
+// const deleteProperty = async (req, res) => {
+//   const { id } = req.params;
+//   try {
+//     // delete only user properties
+
+//     const property = await RealtorProperties.findOneAndDelete({
+//       _id: id,
+//       user: req.user._id,
+//     });
+//     const result = await getProperty(property);
+//     // Check if the property was found
+//     if (!result.success) {
+//       return res.status(result.code).json({ message: 'Property not found' });
+//     }
+
+//     // Delete images from Cloudinary
+//     if (property.feature_image) {
+//       await deleteFromCloudinary(property.feature_image);
+//     }
+//     if (property.property_images && property.property_images.length > 0) {
+//       for (const imageUrl of property.property_images) {
+//         await deleteFromCloudinary(imageUrl);
+//       }
+//     }
+//     res.status(result.code).json({ message: 'Property deleted successfully' });
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };
 const deleteProperty = async (req, res) => {
   const { id } = req.params;
   try {
-    // delete only user properties
-
     const property = await RealtorProperties.findOneAndDelete({
       _id: id,
       user: req.user._id,
     });
-    const result = await getProperty(property);
-    // Check if the property was found
-    if (!result.success) {
-      return res.status(result.code).json({ message: 'Property not found' });
+
+    if (!property) {
+      return res.status(404).json({ message: 'Property not found' });
     }
 
     // Delete images from Cloudinary
     if (property.feature_image) {
-      await deleteFromCloudinary(property.feature_image);
+      await deleteFromCloudinary(property.feature_image.public_id);
     }
     if (property.property_images && property.property_images.length > 0) {
-      for (const imageUrl of property.property_images) {
-        await deleteFromCloudinary(imageUrl);
+      for (const image of property.property_images) {
+        await deleteFromCloudinary(image.public_id);
       }
     }
-    res.status(result.code).json({ message: 'Property deleted successfully' });
+
+    res.status(200).json({ message: 'Property deleted successfully' });
   } catch (err) {
+    logger.error('Error deleting property:', err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -281,29 +353,96 @@ const deleteProperty = async (req, res) => {
  * @param {Object} res - The response object.
  * @return {Promise<void>} The updated property and a success message, or an error message if the property is not found or an error occurs.
  */
+
 const editProperty = async (req, res) => {
   const { id } = req.params;
+
   try {
-    // if a realtor is banned they can't create property
     if (req.user.isBanned) {
       return res.status(403).json({ message: 'You are banned', status: 403 });
     }
-    const property = await RealtorProperties.findOneAndUpdate(
-      { _id: id, user: req.user._id },
-      req.body,
-      { new: true }
-    );
-    const result = await getProperty(property);
-    // Check if the property was found
-    if (!result.success) {
-      return res.status(result.code).json({ message: 'Property not found' });
+
+    const property = await RealtorProperties.findOne({
+      _id: id,
+      user: req.user._id,
+    });
+
+    if (!property) {
+      return res.status(404).json({ message: 'Property not found' });
     }
+
+    const imagesToDelete = [];
+
+    // Handle feature image update
+    if (
+      req.body.feature_image &&
+      req.body.feature_image.public_id !== req.body.current_feature_image_id
+    ) {
+      imagesToDelete.push(req.body.current_feature_image_id);
+      const newFeatureImage = await moveToPermamentFolder(
+        req.body.feature_image.public_id
+      );
+
+      property.feature_image = {
+        public_id: newFeatureImage.public_id,
+        url: newFeatureImage.url,
+      };
+    }
+
+    // Handle property images update
+    if (req.body.property_images) {
+      const newPublicIds = new Set(
+        req.body.property_images.map((img) => img.public_id)
+      );
+      const currentPublicIds = new Set(
+        req.body.current_property_image_ids || []
+      );
+
+      // Identify images to delete
+      currentPublicIds.forEach((id) => {
+        if (!newPublicIds.has(id)) {
+          imagesToDelete.push(id);
+        }
+      });
+
+      // Move new and updated images to permanent folder
+      property.property_images = await Promise.all(
+        req.body.property_images.map(async (image) => {
+          if (image.public_id.startsWith('temp_properties/')) {
+            const newImage = await moveToPermamentFolder(image.public_id);
+
+            return {
+              public_id: newImage.public_id,
+              url: newImage.url,
+            };
+          }
+          return image;
+        })
+      );
+    }
+
+    // Remove feature_image from req.body to avoid overwriting the permanent one
+    delete req.body.feature_image;
+    delete req.body.property_images;
+    // Update other fields
+    Object.assign(property, req.body);
+    await property.save();
+
+    // Delete unused images after successful property update
+    for (const publicId of imagesToDelete) {
+      if (publicId) {
+        await deleteFromCloudinary(publicId);
+      }
+    }
+
+    const result = await getProperty(property);
 
     res.status(result.code).json({
       property: result.data,
       message: 'Property updated successfully',
     });
   } catch (err) {
+    logger.error('Error editing property:', err);
     res.status(500).json({ message: err.message });
   }
 };
