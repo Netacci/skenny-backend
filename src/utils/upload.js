@@ -88,7 +88,7 @@ const deleteTempImages = async () => {
 };
 
 // Schedule the job to run every 24 hours
-cron.schedule('*/2 * * * *', () => {
+cron.schedule('0 0 * * *', () => {
   logger.info('Running daily temp image cleanup job...');
   deleteTempImages();
 });
