@@ -87,7 +87,7 @@ const register = async (req, res) => {
       message: 'Realtor created successfully',
       token: verificationToken,
       status: 201,
-    });
+    }); 
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -123,13 +123,18 @@ const verifyEmail = async (req, res) => {
     if (token !== realtor.verificationToken) {
       return res.status(401).json({ message: 'Invalid or expired token' });
     }
-    realtor.auth.token = token;
+
     realtor.is_email_verified = true;
     realtor.verificationToken = undefined;
     await realtor.save();
+    const loginToken = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
     res.status(201).json({
       data: realtor,
-      token,
+      token: loginToken,
       message: 'Email verified successfully',
       status: 201,
     });

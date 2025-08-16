@@ -1,6 +1,36 @@
 import mongoose from 'mongoose';
 import validator from 'validator';
 
+const tenancyRequestSchema = new mongoose.Schema({
+  firstName: String,
+  lastName: String,
+  address: String,
+  phoneNumber: String,
+  stateOfOrigin: String,
+  lga: String,
+  nationality: String,
+  religion: String,
+  addressOfHomeTown: String,
+  occupation: String,
+  designation: String,
+  companyName: String,
+  companyAddress: String,
+  residentialAddress: String,
+  relocationReason: String,
+  numberOfOccupants: Number,
+  apartmentType: String,
+  rentPayer: String,
+  guarantorName: String,
+  date: Date,
+  addressOfRelative: String,
+  natureOfRelationship: String,
+  gurantorPhoneNumber: String,
+  tenantImage: {
+    url: String,
+    public_id: String,
+  },
+}, { timestamps: true });
+
 const realtorPropertiesSchema = new mongoose.Schema(
   {
     property_name: {
@@ -95,6 +125,7 @@ const realtorPropertiesSchema = new mongoose.Schema(
       ref: 'Realtor',
       required: true,
     },
+    tenancyRequests: [tenancyRequestSchema],
   },
   {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },

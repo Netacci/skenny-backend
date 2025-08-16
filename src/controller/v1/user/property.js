@@ -1,5 +1,7 @@
 import { populateUserDetails } from '../../../daos/property-dao.js';
+import Realtor from '../../../models/v1/realtor/auth.js';
 import RealtorProperties from '../../../models/v1/realtor/property.js';
+import { sendEmail } from '../../../utils/emails.js';
 
 /**
  * Retrieves all approved properties from the database based on the provided query parameters.
@@ -77,4 +79,58 @@ const getSingleProperty = async (req, res) => {
   }
 };
 
-export { getAllProperties, getSingleProperty };
+const leaseProperty = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const prop = await RealtorProperties.findById(id);
+    const realtor = await Realtor.findById(prop.user);
+
+    if (!realtor) return res.status(404).json({ message: 'Realtor not found' });
+    if (!prop) return res.status(404).json({ message: 'Property not found' });
+
+    // let tenantImageData = null;
+    // if (req.body.tenantImage) {
+    //   const featImage = JSON.parse(req.body.tenantImage);
+    //   tenantImageData = featImage?.public_id
+    //     ? await moveToPermamentFolder(featImage.public_id)
+    //     : featImage;
+    // }
+
+    const tenancyRequest = {
+      ...req.body,
+      // tenantImage: tenantImageData,
+    };
+
+    // Push new request into property tenancyRequests array
+    prop.tenancyRequests.push(tenancyRequest);
+    await prop.save();
+
+    // Send email to admin (example with SendGrid)
+    const link = `${
+      process.env.NODE_ENV === 'production'
+        ? 'https://skenny.org/login'
+        : 'http://localhost:5174/login'
+    }`;
+
+    const subject = 'New Lease Request';
+    const templateId = process.env.SENDGRID_TEMPLATE_ID_PROPERTY_LEASE;
+    const dynamicData = {
+      first_name: realtor.first_name,
+      property_name: prop.property_name,
+      link: link,
+      subject: subject,
+    };
+    const email = realtor.email;
+
+    await sendEmail(email, templateId, subject, dynamicData);
+
+    res.status(200).json({
+      message: 'Lease request submitted successfully',
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+    logger.error(err);
+  }
+};
+
+export { getAllProperties, getSingleProperty, leaseProperty };

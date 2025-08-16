@@ -6,6 +6,7 @@ dotenv.config();
 
 sendGrid.setApiKey(process.env.SENDGRID_API_KEY);
 const sendEmail = async (to, templateId, subject, dynamicData) => {
+
   try {
     await sendGrid.send({
       to,
@@ -15,8 +16,7 @@ const sendEmail = async (to, templateId, subject, dynamicData) => {
       dynamic_template_data: dynamicData,
     });
   } catch (e) {
-    // console.error(e);
-    logger.error(e);
+    logger.error(e.response.body.errors);
     return e.message;
   }
 };
