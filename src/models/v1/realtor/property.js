@@ -4,6 +4,7 @@ import validator from 'validator';
 const tenancyRequestSchema = new mongoose.Schema({
   firstName: String,
   lastName: String,
+  email: String,
   address: String,
   phoneNumber: String,
   stateOfOrigin: String,
@@ -21,7 +22,6 @@ const tenancyRequestSchema = new mongoose.Schema({
   apartmentType: String,
   rentPayer: String,
   guarantorName: String,
-  date: Date,
   addressOfRelative: String,
   natureOfRelationship: String,
   gurantorPhoneNumber: String,
