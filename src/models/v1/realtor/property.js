@@ -19,7 +19,7 @@ const tenancyRequestSchema = new mongoose.Schema({
   residentialAddress: String,
   relocationReason: String,
   numberOfOccupants: Number,
-  apartmentType: String,
+  apartmentNumber: Number,
   rentPayer: String,
   guarantorName: String,
   addressOfRelative: String,
