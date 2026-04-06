@@ -35,6 +35,7 @@ const corsOptions = {
     'https://www.skenny.org',
     'http://localhost:5175',
     'https://skenny-admin.vercel.app',
+    'https://www.fkglobalproperties.com'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
