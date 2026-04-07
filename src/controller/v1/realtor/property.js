@@ -4,6 +4,7 @@ import {
 } from '../../../daos/property-dao.js';
 import RealtorProperties from '../../../models/v1/realtor/property.js';
 import logger from '../../../utils/logger.js';
+import { sendEmail } from '../../../utils/emails.js';
 import {
   deleteFromCloudinary,
   uploadToCloudinary,
@@ -446,6 +447,77 @@ const editProperty = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+const deleteTenancyRequest = async (req, res) => {
+  const { propertyId, requestId } = req.params;
+  try {
+    const property = await RealtorProperties.findOne({
+      _id: propertyId,
+      user: req.user._id,
+    });
+
+    if (!property) {
+      return res.status(404).json({ message: 'Property not found' });
+    }
+
+    const requestIndex = property.tenancyRequests.findIndex(
+      (r) => r._id.toString() === requestId
+    );
+
+    if (requestIndex === -1) {
+      return res.status(404).json({ message: 'Tenancy request not found' });
+    }
+
+    property.tenancyRequests.splice(requestIndex, 1);
+    await property.save();
+
+    res.status(200).json({ message: 'Tenancy request deleted successfully' });
+  } catch (err) {
+    logger.error('Error deleting tenancy request:', err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const approveTenancyRequest = async (req, res) => {
+  const { propertyId, requestId } = req.params;
+  try {
+    const property = await RealtorProperties.findOne({
+      _id: propertyId,
+      user: req.user._id,
+    });
+
+    if (!property) {
+      return res.status(404).json({ message: 'Property not found' });
+    }
+
+    const tenancyRequest = property.tenancyRequests.find(
+      (r) => r._id.toString() === requestId
+    );
+
+    if (!tenancyRequest) {
+      return res.status(404).json({ message: 'Tenancy request not found' });
+    }
+
+    if (!tenancyRequest.email) {
+      return res.status(400).json({ message: 'Tenant email not found' });
+    }
+
+    await sendEmail(
+      tenancyRequest.email,
+      'tenancy-approved',
+      `Your Tenancy Application Has Been Approved – ${property.property_name}`,
+      {
+        first_name: tenancyRequest.firstName,
+        property_name: property.property_name,
+      }
+    );
+
+    res.status(200).json({ message: 'Tenancy request approved and email sent' });
+  } catch (err) {
+    logger.error('Error approving tenancy request:', err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
 export {
   getAllProperties,
   getSingleProperty,
@@ -453,4 +525,6 @@ export {
   editProperty,
   deleteProperty,
   uploadPropertyImages,
+  deleteTenancyRequest,
+  approveTenancyRequest,
 };

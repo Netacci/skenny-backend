@@ -105,24 +105,28 @@ const leaseProperty = async (req, res) => {
     prop.tenancyRequests.push(tenancyRequest);
     await prop.save();
 
-    // Send email to admin (example with SendGrid)
-    const link = `${
+    const dashboardLink =
       process.env.NODE_ENV === 'production'
-        ? 'https://skenny.org/login'
-        : 'http://localhost:5174/login'
-    }`;
+        ? 'https://fkglobalproperties.com/login'
+        : 'http://localhost:5174/login';
 
-    const subject = 'New Lease Request';
-    const templateId = process.env.SENDGRID_TEMPLATE_ID_PROPERTY_LEASE;
-    const dynamicData = {
-      first_name: realtor.first_name,
-      property_name: prop.property_name,
-      link: link,
-      subject: subject,
-    };
+    const subject = `New Tenancy Request – ${prop.property_name}`;
     const email = realtor.email;
+    const tenantEmail = req.body.email;
 
-    await sendEmail(email, templateId, subject, dynamicData);
+    await sendEmail(
+      email,
+      'lease-request',
+      subject,
+      {
+        realtor_name: realtor.first_name,
+        property_name: prop.property_name,
+        dashboard_link: dashboardLink,
+        // spread all tenant fields directly so the template can access them by name
+        ...req.body,
+      },
+      { replyTo: tenantEmail }
+    );
 
     res.status(200).json({
       message: 'Lease request submitted successfully',

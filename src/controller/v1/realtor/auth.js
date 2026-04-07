@@ -76,13 +76,10 @@ const register = async (req, res) => {
     const link = `${hostlink}/email/confirm/${verificationToken}`;
 
     const subject = 'Verify your email to complete registration';
-    const dynamicData = {
+    await sendEmail(realtor.email, 'verify-email', subject, {
       first_name: realtor.first_name,
       verification_link: link,
-      subject: subject,
-    };
-    const templateId = process.env.SENDGRID_TEMPLATE_ID;
-    await sendEmail(realtor.email, templateId, subject, dynamicData);
+    });
     res.status(201).json({
       message: 'Realtor created successfully',
       token: verificationToken,
@@ -315,14 +312,11 @@ const forgotPassword = async (req, res) => {
         : 'http://localhost:5174';
     await realtor.save();
     const subject = 'Password reset request';
-    const templateId = process.env.SENDGRID_TEMPLATE_ID_RESET;
     const link = `${hostlink}/reset-password/${token}`;
-    const dynamicData = {
-      verification_link: link,
-      subject: subject,
-    };
 
-    await sendEmail(realtor.email, templateId, subject, dynamicData);
+    await sendEmail(realtor.email, 'forgot-password', subject, {
+      verification_link: link,
+    });
     res.status(200).json({
       message: 'Password reset link sent to your email',
       token,

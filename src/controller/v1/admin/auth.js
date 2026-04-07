@@ -44,15 +44,17 @@ const addAdmin = async (req, res) => {
       password: hashedPassword,
     });
     await admin.save();
-    const subject = 'New Admin Added';
+    const subject = "You've been added as an admin on Skenny";
+    const loginLink =
+      process.env.NODE_ENV === 'production'
+        ? 'https://skenny.org/login'
+        : 'http://localhost:5174/login';
 
-    const dynamicData = {
+    await sendEmail(admin.email, 'admin-invite', subject, {
       first_name: admin.first_name,
       admin_password: password,
-      subject,
-    };
-    const templateId = process.env.SENDGRID_TEMPLATE_ID_ADMIN;
-    await sendEmail(admin.email, templateId, subject, dynamicData);
+      login_link: loginLink,
+    });
     res.status(201).json({
       message: 'Admin added successfully',
       status: 201,

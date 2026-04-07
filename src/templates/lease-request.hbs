@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Tenancy Request</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f4f5;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f5;padding:40px 0;">
+    <tr>
+      <td align="center">
+        <table width="620" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+
+          <!-- Header -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#1a3c5e 0%,#2d6a9f 100%);padding:36px 48px;text-align:center;">
+              <h1 style="margin:0;color:#ffffff;font-size:26px;font-weight:700;letter-spacing:-0.5px;">Frakensons Global</h1>
+              <p style="margin:8px 0 0;color:rgba(255,255,255,0.75);font-size:12px;letter-spacing:1px;text-transform:uppercase;">Property Management</p>
+            </td>
+          </tr>
+
+          <!-- Alert banner -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#f0fff4,#c6f6d5);padding:24px 48px;text-align:center;border-bottom:2px solid #9ae6b4;">
+              <div style="font-size:40px;margin-bottom:4px;">🏠</div>
+              <h2 style="margin:0;color:#276749;font-size:20px;font-weight:600;">New Tenancy Request</h2>
+              <p style="margin:6px 0 0;color:#2f855a;font-size:14px;">You have a new application for <strong>{{property_name}}</strong></p>
+            </td>
+          </tr>
+
+          <!-- Intro -->
+          <tr>
+            <td style="padding:36px 48px 24px;">
+              <p style="margin:0;color:#4a5568;font-size:15px;line-height:1.7;">
+                Hi <strong>{{realtor_name}}</strong>, a prospective tenant has submitted a tenancy application. All their details are listed below. Simply reply to this email to contact them directly.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Section: Personal Information -->
+          <tr>
+            <td style="padding:0 48px 8px;">
+              <p style="margin:0 0 12px;color:#1a3c5e;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #e2e8f0;padding-bottom:8px;">Personal Information</p>
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td width="50%" style="padding:6px 12px 6px 0;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">Full Name</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;font-weight:600;">{{val firstName}} {{val lastName}}</p>
+                  </td>
+                  <td width="50%" style="padding:6px 0;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">Email</p>
+                    <p style="margin:0;color:#2d6a9f;font-size:14px;font-weight:600;">{{val email}}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td width="50%" style="padding:10px 12px 6px 0;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">Phone Number</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;">{{val phoneNumber}}</p>
+                  </td>
+                  <td width="50%" style="padding:10px 0 6px;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">Nationality</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;">{{val nationality}}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td width="50%" style="padding:10px 12px 6px 0;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">State of Origin</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;">{{val stateOfOrigin}}</p>
+                  </td>
+                  <td width="50%" style="padding:10px 0 6px;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">LGA</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;">{{val lga}}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td width="50%" style="padding:10px 12px 6px 0;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">Religion</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;">{{val religion}}</p>
+                  </td>
+                  <td width="50%" style="padding:10px 0 6px;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">Current Address</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;">{{val address}}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2" style="padding:10px 0 6px;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">Address of Hometown</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;">{{val addressOfHomeTown}}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr><td style="padding:16px 48px 0;"><hr style="border:none;border-top:1px solid #edf2f7;margin:0;" /></td></tr>
+
+          <!-- Section: Employment -->
+          <tr>
+            <td style="padding:16px 48px 8px;">
+              <p style="margin:0 0 12px;color:#1a3c5e;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #e2e8f0;padding-bottom:8px;">Employment Details</p>
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td width="50%" style="padding:6px 12px 6px 0;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">Occupation</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;">{{val occupation}}</p>
+                  </td>
+                  <td width="50%" style="padding:6px 0;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">Designation</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;">{{val designation}}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td width="50%" style="padding:10px 12px 6px 0;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">Company Name</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;">{{val companyName}}</p>
+                  </td>
+                  <td width="50%" style="padding:10px 0 6px;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">Company Address</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;">{{val companyAddress}}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr><td style="padding:16px 48px 0;"><hr style="border:none;border-top:1px solid #edf2f7;margin:0;" /></td></tr>
+
+          <!-- Section: Tenancy Details -->
+          <tr>
+            <td style="padding:16px 48px 8px;">
+              <p style="margin:0 0 12px;color:#1a3c5e;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #e2e8f0;padding-bottom:8px;">Tenancy Details</p>
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td width="50%" style="padding:6px 12px 6px 0;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">Residential Address</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;">{{val residentialAddress}}</p>
+                  </td>
+                  <td width="50%" style="padding:6px 0;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">Apartment Number</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;">{{val apartmentNumber}}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td width="50%" style="padding:10px 12px 6px 0;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">No. of Occupants</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;">{{val numberOfOccupants}}</p>
+                  </td>
+                  <td width="50%" style="padding:10px 0 6px;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">Rent Payer</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;">{{val rentPayer}}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2" style="padding:10px 0 6px;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">Reason for Relocation</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;">{{val relocationReason}}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr><td style="padding:16px 48px 0;"><hr style="border:none;border-top:1px solid #edf2f7;margin:0;" /></td></tr>
+
+          <!-- Section: Guarantor -->
+          <tr>
+            <td style="padding:16px 48px 8px;">
+              <p style="margin:0 0 12px;color:#1a3c5e;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #e2e8f0;padding-bottom:8px;">Guarantor Information</p>
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td width="50%" style="padding:6px 12px 6px 0;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">Guarantor Name</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;">{{val guarantorName}}</p>
+                  </td>
+                  <td width="50%" style="padding:6px 0;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">Guarantor Phone</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;">{{val gurantorPhoneNumber}}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td width="50%" style="padding:10px 12px 6px 0;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">Nature of Relationship</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;">{{val natureOfRelationship}}</p>
+                  </td>
+                  <td width="50%" style="padding:10px 0 6px;vertical-align:top;">
+                    <p style="margin:0 0 2px;color:#718096;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;">Relative's Address</p>
+                    <p style="margin:0;color:#2d3748;font-size:14px;">{{val addressOfRelative}}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Reply tip -->
+          <tr>
+            <td style="padding:16px 48px 32px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px;">
+                <tr>
+                  <td style="background:#ebf8ff;border-radius:8px;padding:14px 18px;border-left:4px solid #63b3ed;">
+                    <p style="margin:0;color:#2b6cb0;font-size:13px;line-height:1.6;">
+                      <strong>Tip:</strong> Simply reply to this email to respond directly to <strong>{{val firstName}}</strong> at {{val email}}.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+              <!-- CTA -->
+              <table cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="border-radius:8px;background:linear-gradient(135deg,#276749,#38a169);">
+                    <a href="{{dashboard_link}}" target="_blank"
+                       style="display:inline-block;padding:13px 32px;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;border-radius:8px;">
+                      View in Dashboard
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr>
+            <td style="padding:0 48px;">
+              <hr style="border:none;border-top:1px solid #e2e8f0;margin:0;" />
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:24px 48px 36px;text-align:center;">
+              <p style="margin:0;color:#a0aec0;font-size:12px;line-height:1.6;">
+                &copy; {{year}} Frakensons Global Property Management. All rights reserved.<br />
+                <a href="https://fkglobalproperties.com" style="color:#a0aec0;text-decoration:underline;">fkglobalproperties.com</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>You've Been Added as Admin</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f4f5;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f5;padding:40px 0;">
+    <tr>
+      <td align="center">
+        <table width="580" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+          <!-- Header -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#1a3c5e 0%,#2d6a9f 100%);padding:40px 48px;text-align:center;">
+              <h1 style="margin:0;color:#ffffff;font-size:28px;font-weight:700;letter-spacing:-0.5px;">Frakensons Global</h1>
+              <p style="margin:8px 0 0;color:rgba(255,255,255,0.75);font-size:13px;letter-spacing:1px;text-transform:uppercase;">Property Management</p>
+            </td>
+          </tr>
+          <!-- Icon banner -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#ebf8ff,#bee3f8);padding:28px 48px;text-align:center;border-bottom:2px solid #90cdf4;">
+              <div style="font-size:44px;margin-bottom:4px;">🛡️</div>
+              <h2 style="margin:0;color:#2b6cb0;font-size:20px;font-weight:600;">Admin Access Granted</h2>
+            </td>
+          </tr>
+          <!-- Body -->
+          <tr>
+            <td style="padding:48px 48px 32px;">
+              <p style="margin:0 0 12px;color:#4a5568;font-size:15px;line-height:1.7;">Hi <strong>{{first_name}}</strong>,</p>
+              <p style="margin:0 0 28px;color:#4a5568;font-size:15px;line-height:1.7;">
+                You've been added as an administrator on the Frakensons Global platform. Below are your login credentials — please log in and change your password as soon as possible.
+              </p>
+              <!-- Credentials box -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;">
+                <tr>
+                  <td style="background:#f7fafc;border-radius:8px;padding:24px;border:1px solid #e2e8f0;">
+                    <p style="margin:0 0 4px;color:#718096;font-size:12px;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;">Temporary Password</p>
+                    <p style="margin:0;color:#1a1a2e;font-size:22px;font-weight:700;letter-spacing:2px;font-family:monospace;">{{admin_password}}</p>
+                  </td>
+                </tr>
+              </table>
+              <!-- CTA Button -->
+              <table cellpadding="0" cellspacing="0" style="margin:0 0 28px;">
+                <tr>
+                  <td style="border-radius:8px;background:linear-gradient(135deg,#1a3c5e,#2d6a9f);">
+                    <a href="{{login_link}}" target="_blank"
+                       style="display:inline-block;padding:14px 36px;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;border-radius:8px;">
+                      Log In to Dashboard
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <!-- Security note -->
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="background:#fffff0;border-radius:8px;padding:16px 20px;border-left:4px solid #f6e05e;">
+                    <p style="margin:0;color:#744210;font-size:13px;line-height:1.6;">
+                      <strong>Security reminder:</strong> Change your password immediately after your first login. Never share your credentials with anyone.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Divider -->
+          <tr>
+            <td style="padding:0 48px;">
+              <hr style="border:none;border-top:1px solid #e2e8f0;margin:0;" />
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding:24px 48px 40px;text-align:center;">
+              <p style="margin:0;color:#a0aec0;font-size:12px;line-height:1.6;">
+                &copy; {{year}} Frakensons Global Real Estate. All rights reserved.<br />
+                <a href="https://fkglobalproperties.com" style="color:#a0aec0;text-decoration:underline;">fkglobalproperties.com</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
